@@ -12,7 +12,7 @@ func TestChar(t *testing.T) {
 	next, parsed, _ := Char('H')(input)
 
 	// assert
-	if parsed != expectedParsed {
+	if parsed.take() != expectedParsed {
 		t.Errorf("should return the parsed character")
 	}
 
@@ -31,7 +31,7 @@ func TestMatch(t *testing.T) {
 	next, parsed, _ := Match("Hello")(input)
 
 	// assert
-	if parsed != expectedParsed {
+	if parsed.take() != expectedParsed {
 		t.Errorf("should return parsed substring")
 	}
 

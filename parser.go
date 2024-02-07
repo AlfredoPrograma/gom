@@ -4,7 +4,35 @@ import (
 	"fmt"
 )
 
-type Parser[O any] func(string) (string, O, error)
+type Unwrappable interface {
+	unwrap(dest *any)
+}
+
+type UnwrappableString string
+
+func (s UnwrappableString) unwrap(dest *any) {
+	dest = &string(s)
+}
+
+func (s UnwrappableString) take() string {
+	var dest string
+	s.unwrap(&dest)
+
+	return dest
+}
+
+type MapFn[I Unwrappable, K Unwrappable] func(parsed I) (K, error)
+
+type Parser[O Unwrappable] func(string) (string, O, error)
+
+/* func (p Parser[O]) Map(mapper MapFn[O, Unwrappable]) Parser[Unwrappable] {
+	return func(s string) (string, string, error) {
+		next, p1, _ := p(s)
+		p2, err := mapper(p1)
+
+		return next, p2, err
+	}
+} */
 
 // Takes a target rune and returns a parser which matches the first rune of the input string against the target.
 //
@@ -26,8 +54,8 @@ type Parser[O any] func(string) (string, O, error)
 //		fmt.Println(parsed) // ""
 //		fmt.Println(err)    // error
 //	}
-func Char(target rune) Parser[string] {
-	return func(input string) (string, string, error) {
+func Char(target rune) Parser[UnwrappableString] {
+	return func(input string) (string, UnwrappableString, error) {
 		parsed := string(input[0])
 
 		if parsed != string(target) {
@@ -36,7 +64,7 @@ func Char(target rune) Parser[string] {
 
 		next := input[1:]
 
-		return next, parsed, nil
+		return next, UnwrappableString(parsed), nil
 	}
 }
 
@@ -60,8 +88,8 @@ func Char(target rune) Parser[string] {
 //		fmt.Println(parsed) // ""
 //		fmt.Println(err)    // error
 //	}
-func Match(target string) Parser[string] {
-	return func(input string) (string, string, error) {
+func Match(target string) Parser[UnwrappableString] {
+	return func(input string) (string, UnwrappableString, error) {
 		targetLength := len(target)
 
 		if targetLength > len(input) {
@@ -74,6 +102,6 @@ func Match(target string) Parser[string] {
 			return "", "", fmt.Errorf("cannot match target against given input")
 		}
 
-		return input[len(target):], parsed, nil
+		return input[len(target):], UnwrappableString(parsed), nil
 	}
 }
