@@ -20,3 +20,22 @@ func TestChar(t *testing.T) {
 		t.Errorf("should return the rest of the input")
 	}
 }
+
+func TestMatch(t *testing.T) {
+	// arrange
+	input := "Hello world"
+	expectedParsed := "Hello"
+	expectedNext := " world"
+
+	// act
+	next, parsed, _ := Match("Hello")(input)
+
+	// assert
+	if parsed != expectedParsed {
+		t.Errorf("should return parsed substring")
+	}
+
+	if next != expectedNext {
+		t.Errorf("should return the rest of the input")
+	}
+}
