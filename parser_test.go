@@ -58,3 +58,22 @@ func TestTake(t *testing.T) {
 		t.Errorf("should return the rest of the input")
 	}
 }
+
+func TestOneOf(t *testing.T) {
+	// arrange
+	input := "abcde"
+	expectedParsed := "a"
+	expectedNext := "bcde"
+
+	// act
+	next, parsed, _ := OneOf("cbax")(input)
+
+	// assert
+	if parsed != expectedParsed {
+		t.Errorf("should return the parsed character")
+	}
+
+	if next != expectedNext {
+		t.Errorf("should return the rest of the input")
+	}
+}

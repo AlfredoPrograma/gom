@@ -110,3 +110,37 @@ func Take(amount uint) Parser[string] {
 		return input[amount:], parsed, nil
 	}
 }
+
+// Takes a set of characters and returns a parser which tries to match the first character in the input string against one of the given characters.
+//
+// If it matches, returns the rest of the string, the character matched as string and a nil error.
+// Else returns empty values for the next string and matched string, and returns a fullfilled error.
+//
+// # Examples
+//
+//	func successExample() {
+//		next, parsed, err := OneOf("ekHb")("Hello world")
+//		fmt.Println(next)   // "ello world"
+//		fmt.Println(parsed) // "H"
+//		fmt.Println(err)    // nil
+//	}
+//
+//	func failExample() {
+//		next, parsed, err := OneOf("xyz")("Hello world")
+//		fmt.Println(next)   // ""
+//		fmt.Println(parsed) // ""
+//		fmt.Println(err)    // error
+//	}
+func OneOf(characters string) Parser[string] {
+	return func(input string) (string, string, error) {
+		parsed := string(input[0])
+
+		for _, c := range characters {
+			if parsed == string(c) {
+				return input[1:], parsed, nil
+			}
+		}
+
+		return "", "", fmt.Errorf("none given character matched")
+	}
+}
