@@ -78,3 +78,35 @@ func Match(target string) Parser[string] {
 		return input[len(target):], parsed, nil
 	}
 }
+
+// Takes an unsigned integer and returns a parser which takes the first n characters from the beginning of the input string.
+//
+// If it matches, returns the rest of the string, string built from the taken characters and a nil error.
+// Else returns empty values for the next string and matched string, and returns a fullfilled error.
+//
+// # Examples
+//
+//	func successExample() {
+//		next, parsed, err := Take(5)("Hello world")
+//		fmt.Println(next)   // " world"
+//		fmt.Println(parsed) // "Hello"
+//		fmt.Println(err)    // nil
+//	}
+//
+//	func failExample() {
+//		next, parsed, err := Take(9999)("Hello world")
+//		fmt.Println(next)   // ""
+//		fmt.Println(parsed) // ""
+//		fmt.Println(err)    // error
+//	}
+func Take(amount uint) Parser[string] {
+	return func(input string) (string, string, error) {
+		if amount > uint(len(input)) {
+			return "", "", fmt.Errorf("the amount of characters to take is greater than the input size")
+		}
+
+		parsed := input[:amount]
+
+		return input[amount:], parsed, nil
+	}
+}
