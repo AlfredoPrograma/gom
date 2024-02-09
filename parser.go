@@ -43,7 +43,7 @@ func Char(target rune) Parser[string] {
 
 // Takes a target string and returns a parser which matches the first set of characters of the input string against the target.
 //
-// If it matches, returns the rest of the string, the matched sring and a nil error.
+// If it matches, returns the rest of the string, the matched string and a nil error.
 // Else returns empty values for the next string and matched string, and returns a fullfilled error.
 //
 // # Examples
