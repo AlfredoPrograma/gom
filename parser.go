@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+const (
+	FLEX int = iota
+	STRICT
+)
+
 // Describes the signature function for parsers.
 type Parser[O any] func(input string) (string, O, error)
 
