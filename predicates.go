@@ -49,3 +49,22 @@ func StrictTakeWhile(predicate Predicate) Parser[string] {
 		return input[len(parsed):], parsed, nil
 	}
 }
+
+// Takes a predicate function and applies it sequentially over each character of the input string until evaluates to true.
+//
+// Returns the rest of the string, the accumulated characters which not complied the predacte as string and a nil error.
+func FlexTakeTill(predicate Predicate) Parser[string] {
+	return func(input string) (string, string, error) {
+		var parsed string
+
+		for _, ch := range input {
+			if predicate(ch) {
+				break
+			}
+
+			parsed += string(ch)
+		}
+
+		return input[len(parsed):], parsed, nil
+	}
+}

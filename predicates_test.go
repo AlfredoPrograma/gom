@@ -69,3 +69,24 @@ func TestStrictTakeWhileFail(t *testing.T) {
 		t.Error("should return an error because none character complied predicate on strict parser")
 	}
 }
+
+func TestFlexTakeTill(t *testing.T) {
+	// arrange
+	input := "abc!#123"
+	expectedParsed := "abc!#"
+	expectedNext := "123"
+
+	// act
+	next, parsed, _ := FlexTakeTill(func(ch rune) bool {
+		return unicode.IsDigit(ch)
+	})(input)
+
+	// assert
+	if parsed != expectedParsed {
+		t.Errorf("should return the parsed character")
+	}
+
+	if next != expectedNext {
+		t.Errorf("should return the rest of the input")
+	}
+}
