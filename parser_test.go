@@ -77,3 +77,22 @@ func TestOneOf(t *testing.T) {
 		t.Errorf("should return the rest of the input")
 	}
 }
+
+func TestNoneOf(t *testing.T) {
+	// arrange
+	input := "abcde"
+	expectedParsed := "a"
+	expectedNext := "bcde"
+
+	// act
+	next, parsed, _ := NoneOf("xyz")(input)
+
+	// assert
+	if parsed != expectedParsed {
+		t.Errorf("should return the parsed character")
+	}
+
+	if next != expectedNext {
+		t.Errorf("should return the rest of the input")
+	}
+}

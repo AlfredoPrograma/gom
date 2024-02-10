@@ -144,3 +144,37 @@ func OneOf(characters string) Parser[string] {
 		return "", "", fmt.Errorf("none given character matched")
 	}
 }
+
+// Takes a set of characters and returns a parser which tries to match the first character in the input string against none of the given characters.
+//
+// If it doesnt match, returns the rest of the string, the first character as string and a nil error.
+// Else returns empty values for the next string and matched string, and returns a fullfilled error.
+//
+// # Examples
+//
+//	func successExample() {
+//		next, parsed, err := NoneOf("abcd")("Hello world")
+//		fmt.Println(next)   // "ello world"
+//		fmt.Println(parsed) // "H"
+//		fmt.Println(err)    // nil
+//	}
+//
+//	func failExample() {
+//		next, parsed, err := NoneOf("rkHuO")("Hello world")
+//		fmt.Println(next)   // ""
+//		fmt.Println(parsed) // ""
+//		fmt.Println(err)    // error
+//	}
+func NoneOf(characters string) Parser[string] {
+	return func(input string) (string, string, error) {
+		firstChar := string(input[0])
+
+		for _, c := range characters {
+			if firstChar == string(c) {
+				return "", "", fmt.Errorf("unexpected given character matched")
+			}
+		}
+
+		return input[1:], firstChar, nil
+	}
+}
