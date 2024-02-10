@@ -2,13 +2,16 @@ package main
 
 import "fmt"
 
+// Describes the signature for predicate function in predicate based parsers
 type Predicate func(ch rune) bool
 
+// Represents the compliance condition for the predicate.
 const (
 	COMPLY int = iota
 	UNCOMPLY
 )
 
+// Helper function for define the predicate evaluation based on the parser mode and compliance condition.
 func evalPredicate(input string, parserMode int, breakOn int, predicate Predicate) (string, error) {
 	var accumulated string
 
@@ -39,8 +42,6 @@ func evalPredicate(input string, parserMode int, breakOn int, predicate Predicat
 // Takes a predicate function and applies it sequentially over each character of the input string until evaluates to false.
 //
 // Returns the rest of the string, the accumulated characters which complied the predicate as string and a nil error.
-//
-// It is a flex parser. It means if parser doesn't match anything, it will not consume any character and will not return an error either; it will return input string, empty parsed string and nil error.
 func TakeWhile(predicate Predicate) Parser[string] {
 	return func(input string) (string, string, error) {
 		parsed, _ := evalPredicate(input, FLEX, UNCOMPLY, predicate)
@@ -52,8 +53,6 @@ func TakeWhile(predicate Predicate) Parser[string] {
 // Takes a predicate function and applies it sequentially over each character of the input string until evaluates to false.
 //
 // Returns the rest of the string, the accumulated characters which complied the predicate as string and a nil error.
-//
-// It is a strict parser. It means at least the first character must comply the predicate. If it doesn't, it will return empty values for next string and parsed string, and returns a fullfilled error.
 func StrictTakeWhile(predicate Predicate) Parser[string] {
 	return func(input string) (string, string, error) {
 		parsed, err := evalPredicate(input, STRICT, UNCOMPLY, predicate)
@@ -80,8 +79,6 @@ func TakeTill(predicate Predicate) Parser[string] {
 // Takes a predicate function and applies it sequentially over each character of the input string until evaluates to true.
 //
 // Returns the rest of the string, the accumulated characters which not complied the predicate as string and a nil error.
-//
-// It is a strict parser. It means at least the first character must comply the predicate. If it doesn't, it will return empty values for next string and parsed string, and returns a fullfilled error.
 func StrictTakeTill(predicate Predicate) Parser[string] {
 	return func(input string) (string, string, error) {
 		parsed, err := evalPredicate(input, STRICT, UNCOMPLY, predicate)

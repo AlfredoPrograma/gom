@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+// Represents the type of parser evaluation.
+//
+//   - Flex: flex parsers are parsers which will not fail if they dont match.
+//
+//   - Strict: strict parsers are parsers which will fail if they dont match at least one pattern.
 const (
 	FLEX int = iota
 	STRICT
@@ -16,22 +21,6 @@ type Parser[O any] func(input string) (string, O, error)
 //
 // If it matches, returns the rest of the string, the stringified rune and a nil error.
 // Else returns empty values for the next string and matched string, and returns a fullfilled error.
-//
-// # Examples
-//
-//	func successExample() {
-//		next, parsed, err := Char('H')("Hello world")
-//		fmt.Println(next)   // "ello world"
-//		fmt.Println(parsed) // "h"
-//		fmt.Println(err)    // nil
-//	}
-//
-//	func failExample() {
-//		next, parsed, err := Char('K')("Hello world")
-//		fmt.Println(next)   // ""
-//		fmt.Println(parsed) // ""
-//		fmt.Println(err)    // error
-//	}
 func Char(target rune) Parser[string] {
 	return func(input string) (string, string, error) {
 		parsed := string(input[0])
@@ -50,22 +39,6 @@ func Char(target rune) Parser[string] {
 //
 // If it matches, returns the rest of the string, the matched string and a nil error.
 // Else returns empty values for the next string and matched string, and returns a fullfilled error.
-//
-// # Examples
-//
-//	func successExample() {
-//		next, parsed, err := Match("Hello")("Hello world")
-//		fmt.Println(next)   // " world"
-//		fmt.Println(parsed) // "Hello"
-//		fmt.Println(err)    // nil
-//	}
-//
-//	func failExample() {
-//		next, parsed, err := Match("Invalid")("Hello world")
-//		fmt.Println(next)   // ""
-//		fmt.Println(parsed) // ""
-//		fmt.Println(err)    // error
-//	}
 func Match(target string) Parser[string] {
 	return func(input string) (string, string, error) {
 		targetLength := len(target)
@@ -88,22 +61,6 @@ func Match(target string) Parser[string] {
 //
 // If it matches, returns the rest of the string, string built from the taken characters and a nil error.
 // Else returns empty values for the next string and matched string, and returns a fullfilled error.
-//
-// # Examples
-//
-//	func successExample() {
-//		next, parsed, err := Take(5)("Hello world")
-//		fmt.Println(next)   // " world"
-//		fmt.Println(parsed) // "Hello"
-//		fmt.Println(err)    // nil
-//	}
-//
-//	func failExample() {
-//		next, parsed, err := Take(9999)("Hello world")
-//		fmt.Println(next)   // ""
-//		fmt.Println(parsed) // ""
-//		fmt.Println(err)    // error
-//	}
 func Take(amount uint) Parser[string] {
 	return func(input string) (string, string, error) {
 		if amount > uint(len(input)) {
@@ -120,22 +77,6 @@ func Take(amount uint) Parser[string] {
 //
 // If it matches, returns the rest of the string, the character matched as string and a nil error.
 // Else returns empty values for the next string and matched string, and returns a fullfilled error.
-//
-// # Examples
-//
-//	func successExample() {
-//		next, parsed, err := OneOf("ekHb")("Hello world")
-//		fmt.Println(next)   // "ello world"
-//		fmt.Println(parsed) // "H"
-//		fmt.Println(err)    // nil
-//	}
-//
-//	func failExample() {
-//		next, parsed, err := OneOf("xyz")("Hello world")
-//		fmt.Println(next)   // ""
-//		fmt.Println(parsed) // ""
-//		fmt.Println(err)    // error
-//	}
 func OneOf(characters string) Parser[string] {
 	return func(input string) (string, string, error) {
 		parsed := string(input[0])
@@ -154,22 +95,6 @@ func OneOf(characters string) Parser[string] {
 //
 // If it doesnt match, returns the rest of the string, the first character as string and a nil error.
 // Else returns empty values for the next string and matched string, and returns a fullfilled error.
-//
-// # Examples
-//
-//	func successExample() {
-//		next, parsed, err := NoneOf("abcd")("Hello world")
-//		fmt.Println(next)   // "ello world"
-//		fmt.Println(parsed) // "H"
-//		fmt.Println(err)    // nil
-//	}
-//
-//	func failExample() {
-//		next, parsed, err := NoneOf("rkHuO")("Hello world")
-//		fmt.Println(next)   // ""
-//		fmt.Println(parsed) // ""
-//		fmt.Println(err)    // error
-//	}
 func NoneOf(characters string) Parser[string] {
 	return func(input string) (string, string, error) {
 		firstChar := string(input[0])
