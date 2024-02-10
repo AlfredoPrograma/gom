@@ -5,7 +5,7 @@ import (
 )
 
 // Describes the signature function for parsers.
-type Parser[O any] func(string) (string, O, error)
+type Parser[O any] func(input string) (string, O, error)
 
 // Takes a target rune and returns a parser which matches the first rune of the input string against the target.
 //
