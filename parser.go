@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Represents the type of parser evaluation.
 type ParserMode int
 
-// - Flex: flex parsers are parsers which will not fail if they dont match.
+//   - Flex: flex parsers are parsers which will not fail if they dont match.
 //
-// - Strict: strict parsers are parsers which will fail if they dont match at least one pattern.
+//   - Strict: strict parsers are parsers which will fail if they dont match at least one pattern.
+
 const (
 	FLEX ParserMode = iota
 	STRICT
@@ -107,5 +109,34 @@ func NoneOf(characters string) Parser[string] {
 		}
 
 		return input[1:], firstChar, nil
+	}
+}
+
+// Takes a target and returns a parser which tries to accumulate all the characters until reach the given target.
+//
+// If it matches, returns the rest input including the target, the accumulated characters before the target occurrence as string
+// and a nil error.
+func TakeUntil(target string) Parser[string] {
+	return func(input string) (string, string, error) {
+		parsed, next, found := strings.Cut(input, target)
+
+		if !found {
+			return input, "", nil
+		}
+
+		return target + next, parsed, nil
+	}
+}
+
+// Same parsing proccess than [TakeUntil] but in a [STRICT] mode.
+func StrictTakeUntil(target string) Parser[string] {
+	return func(input string) (string, string, error) {
+		parsed, next, found := strings.Cut(input, target)
+
+		if !found {
+			return "", "", fmt.Errorf("cannot match target")
+		}
+
+		return target + next, parsed, nil
 	}
 }
