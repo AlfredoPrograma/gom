@@ -6,13 +6,15 @@ import "fmt"
 type Predicate func(ch rune) bool
 
 // Represents the compliance condition for the predicate.
+type ComplianceMode int
+
 const (
-	COMPLY int = iota
+	COMPLY ComplianceMode = iota
 	UNCOMPLY
 )
 
 // Helper function for define the predicate evaluation based on the parser mode and compliance condition.
-func evalPredicate(input string, parserMode int, breakOn int, predicate Predicate) (string, error) {
+func evalPredicate(input string, parserMode ParserMode, breakOn ComplianceMode, predicate Predicate) (string, error) {
 	var accumulated string
 
 	for _, ch := range input {

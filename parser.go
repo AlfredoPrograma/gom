@@ -5,12 +5,13 @@ import (
 )
 
 // Represents the type of parser evaluation.
+type ParserMode int
+
+// - Flex: flex parsers are parsers which will not fail if they dont match.
 //
-//   - Flex: flex parsers are parsers which will not fail if they dont match.
-//
-//   - Strict: strict parsers are parsers which will fail if they dont match at least one pattern.
+// - Strict: strict parsers are parsers which will fail if they dont match at least one pattern.
 const (
-	FLEX int = iota
+	FLEX ParserMode = iota
 	STRICT
 )
 
