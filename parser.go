@@ -51,13 +51,13 @@ func Match(target string) Parser[string] {
 		targetLength := len(target)
 
 		if targetLength > len(input) {
-			return "", "", fmt.Errorf("given target is longer than the input to compare")
+			return "", "", fmt.Errorf("input string is too short for parse")
 		}
 
 		parsed := input[:len(target)]
 
 		if parsed != target {
-			return "", "", fmt.Errorf("cannot match target against given input")
+			return "", "", fmt.Errorf("target does not match")
 		}
 
 		return input[len(target):], parsed, nil

@@ -75,22 +75,59 @@ func TestChar(t *testing.T) {
 }
 
 func TestMatch(t *testing.T) {
-	// arrange
-	input := "Hello world"
-	expectedParsed := "Hello"
-	expectedNext := " world"
-
-	// act
-	next, parsed, _ := Match("Hello")(input)
-
-	// assert
-	if parsed != expectedParsed {
-		t.Errorf("should return parsed substring")
+	tests := []struct {
+		TestParserCore[string]
+		target string
+	}{
+		{
+			TestParserCore: TestParserCore[string]{
+				name:  "successful parse",
+				input: "This is a message",
+				want: ParseResult[string]{
+					next:   " is a message",
+					parsed: "This",
+					err:    nil,
+				},
+			},
+			target: "This",
+		},
+		{
+			TestParserCore: TestParserCore[string]{
+				name:  "too short input error",
+				input: "short",
+				want: ParseResult[string]{
+					next:   "",
+					parsed: "",
+					err:    fmt.Errorf("input string is too short for parse"),
+				},
+			},
+			target: "Long target",
+		},
+		{
+			TestParserCore: TestParserCore[string]{
+				name:  "target does not match error",
+				input: "My test string",
+				want: ParseResult[string]{
+					next:   "",
+					parsed: "",
+					err:    fmt.Errorf("target does not match"),
+				},
+			},
+			target: "Your",
+		},
 	}
 
-	if next != expectedNext {
-		t.Errorf("should return the rest of the input")
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			next, parsed, err := Match(tc.target)(tc.input)
+			got := ParseResult[string]{next, parsed, err}
+
+			if !reflect.DeepEqual(got, tc.want) {
+				t.Fatalf("%s: expected %+v, but got %+v", tc.name, tc.want, got)
+			}
+		})
 	}
+
 }
 
 func TestTake(t *testing.T) {
