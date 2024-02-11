@@ -71,7 +71,7 @@ func Match(target string) Parser[string] {
 func Take(amount uint) Parser[string] {
 	return func(input string) (string, string, error) {
 		if amount > uint(len(input)) {
-			return "", "", fmt.Errorf("the amount of characters to take is greater than the input size")
+			return "", "", fmt.Errorf("input string is too short for parse")
 		}
 
 		parsed := input[:amount]
