@@ -86,6 +86,10 @@ func Take(amount uint) Parser[string] {
 // Else returns empty values for the next string and matched string, and returns a fullfilled error.
 func OneOf(characters string) Parser[string] {
 	return func(input string) (string, string, error) {
+		if len(input) == 0 {
+			return "", "", fmt.Errorf("input string is too short for parse")
+		}
+
 		parsed := string(input[0])
 
 		for _, c := range characters {
@@ -94,7 +98,7 @@ func OneOf(characters string) Parser[string] {
 			}
 		}
 
-		return "", "", fmt.Errorf("none given character matched")
+		return "", "", fmt.Errorf("none character match")
 	}
 }
 

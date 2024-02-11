@@ -174,21 +174,57 @@ func TestTake(t *testing.T) {
 }
 
 func TestOneOf(t *testing.T) {
-	// arrange
-	input := "abcde"
-	expectedParsed := "a"
-	expectedNext := "bcde"
-
-	// act
-	next, parsed, _ := OneOf("cbax")(input)
-
-	// assert
-	if parsed != expectedParsed {
-		t.Errorf("should return the parsed character")
+	tests := []struct {
+		TestParserCore[string]
+		characters string
+	}{
+		{
+			TestParserCore: TestParserCore[string]{
+				name:  "successful parse",
+				input: "abcdefg",
+				want: ParseResult[string]{
+					next:   "bcdefg",
+					parsed: "a",
+					err:    nil,
+				},
+			},
+			characters: "xyaz",
+		},
+		{
+			TestParserCore: TestParserCore[string]{
+				name:  "too short input error",
+				input: "",
+				want: ParseResult[string]{
+					next:   "",
+					parsed: "",
+					err:    fmt.Errorf("input string is too short for parse"),
+				},
+			},
+			characters: "abc",
+		},
+		{
+			TestParserCore: TestParserCore[string]{
+				name:  "none character match error",
+				input: "abc",
+				want: ParseResult[string]{
+					next:   "",
+					parsed: "",
+					err:    fmt.Errorf("none character match"),
+				},
+			},
+			characters: "xyz",
+		},
 	}
 
-	if next != expectedNext {
-		t.Errorf("should return the rest of the input")
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			next, parsed, err := OneOf(tc.characters)(tc.input)
+			got := ParseResult[string]{next, parsed, err}
+
+			if !reflect.DeepEqual(got, tc.want) {
+				t.Fatalf("%s: expected %+v, but got %+v", tc.name, tc.want, got)
+			}
+		})
 	}
 }
 
