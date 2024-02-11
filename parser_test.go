@@ -1,25 +1,66 @@
 package main
 
 import (
+	"fmt"
+	"reflect"
 	"testing"
 )
 
+type ParseResult[O any] struct {
+	next   string
+	parsed O
+	err    error
+}
+
 func TestChar(t *testing.T) {
-	// arrange
-	input := "Hello world"
-	expectedParsed := string(input[0])
-	expectedNext := input[1:]
-
-	// act
-	next, parsed, _ := Char('H')(input)
-
-	// assert
-	if parsed != expectedParsed {
-		t.Errorf("should return the parsed character")
+	tests := []struct {
+		name   string
+		input  string
+		target rune
+		want   ParseResult[string]
+	}{
+		{
+			name:   "successful parse",
+			input:  "Hello world",
+			target: 'H',
+			want: ParseResult[string]{
+				next:   "ello world",
+				parsed: "H",
+				err:    nil,
+			},
+		},
+		{
+			name:   "too short input error",
+			input:  "",
+			target: 'K',
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("input string is too short for parse"),
+			},
+		},
+		{
+			name:   "character does not match error",
+			input:  "Another message",
+			target: 'r',
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("character does not match"),
+			},
+		},
 	}
 
-	if next != expectedNext {
-		t.Errorf("should return the rest of the input")
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			next, parsed, err := Char(tc.target)(tc.input)
+			got := ParseResult[string]{next, parsed, err}
+
+			if !reflect.DeepEqual(got, tc.want) {
+				t.Fatalf("%s: expected %+v, but got %+v", tc.name, tc.want, got)
+			}
+		})
+
 	}
 }
 

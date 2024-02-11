@@ -26,6 +26,10 @@ type Parser[O any] func(input string) (string, O, error)
 // Else returns empty values for the next string and matched string, and returns a fullfilled error.
 func Char(target rune) Parser[string] {
 	return func(input string) (string, string, error) {
+		if len(input) == 0 {
+			return "", "", fmt.Errorf("input string is too short for parse")
+		}
+
 		parsed := string(input[0])
 
 		if parsed != string(target) {
