@@ -108,11 +108,15 @@ func OneOf(characters string) Parser[string] {
 // Else returns empty values for the next string and matched string, and returns a fullfilled error.
 func NoneOf(characters string) Parser[string] {
 	return func(input string) (string, string, error) {
+		if len(input) == 0 {
+			return "", "", fmt.Errorf("input string is too short for parse")
+		}
+
 		firstChar := string(input[0])
 
 		for _, c := range characters {
 			if firstChar == string(c) {
-				return "", "", fmt.Errorf("unexpected given character matched")
+				return "", "", fmt.Errorf("some character match")
 			}
 		}
 
