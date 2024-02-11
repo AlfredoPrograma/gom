@@ -12,42 +12,52 @@ type ParseResult[O any] struct {
 	err    error
 }
 
+type TestParserCore[O any] struct {
+	name  string
+	input string
+	want  ParseResult[O]
+}
+
 func TestChar(t *testing.T) {
 	tests := []struct {
-		name   string
-		input  string
+		TestParserCore[string]
 		target rune
-		want   ParseResult[string]
 	}{
 		{
-			name:   "successful parse",
-			input:  "Hello world",
+			TestParserCore: TestParserCore[string]{
+				name:  "successful parse",
+				input: "Hello world",
+				want: ParseResult[string]{
+					next:   "ello world",
+					parsed: "H",
+					err:    nil,
+				},
+			},
 			target: 'H',
-			want: ParseResult[string]{
-				next:   "ello world",
-				parsed: "H",
-				err:    nil,
-			},
 		},
 		{
-			name:   "too short input error",
-			input:  "",
+			TestParserCore: TestParserCore[string]{
+				name:  "too short input error",
+				input: "",
+				want: ParseResult[string]{
+					next:   "",
+					parsed: "",
+					err:    fmt.Errorf("input string is too short for parse"),
+				},
+			},
 			target: 'K',
-			want: ParseResult[string]{
-				next:   "",
-				parsed: "",
-				err:    fmt.Errorf("input string is too short for parse"),
-			},
 		},
 		{
-			name:   "character does not match error",
-			input:  "Another message",
-			target: 'r',
-			want: ParseResult[string]{
-				next:   "",
-				parsed: "",
-				err:    fmt.Errorf("character does not match"),
+			TestParserCore: TestParserCore[string]{
+				name:  "character does not match error",
+				input: "Another message",
+				want: ParseResult[string]{
+					next:   "",
+					parsed: "",
+					err:    fmt.Errorf("character does not match"),
+				},
 			},
+			target: 'r',
 		},
 	}
 
