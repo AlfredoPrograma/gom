@@ -2,369 +2,235 @@ package main
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 )
 
-type ParseResult[O any] struct {
-	next   string
-	parsed O
-	err    error
-}
-
-type TestParserCore[O any] struct {
-	name  string
-	input string
-	want  ParseResult[O]
-}
-
 func TestChar(t *testing.T) {
-	tests := []struct {
-		TestParserCore[string]
-		target rune
-	}{
+	tests := []ParserTestCase[rune, string]{
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "successful parse",
-				input: "Hello world",
-				want: ParseResult[string]{
-					next:   "ello world",
-					parsed: "H",
-					err:    nil,
-				},
+			name:   "successful parse",
+			input:  "Hello world",
+			params: 'H',
+			want: ParseResult[string]{
+				next:   "ello world",
+				parsed: "H",
+				err:    nil,
 			},
-			target: 'H',
 		},
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "too short input error",
-				input: "",
-				want: ParseResult[string]{
-					next:   "",
-					parsed: "",
-					err:    fmt.Errorf("input string is too short for parse"),
-				},
+			name:   "too short input error",
+			input:  "",
+			params: 'K',
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("input string is too short for parse"),
 			},
-			target: 'K',
 		},
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "character does not match error",
-				input: "Another message",
-				want: ParseResult[string]{
-					next:   "",
-					parsed: "",
-					err:    fmt.Errorf("character does not match"),
-				},
+			name:   "character does not match error",
+			input:  "Another message",
+			params: 'r',
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("character does not match"),
 			},
-			target: 'r',
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			next, parsed, err := Char(tc.target)(tc.input)
-			got := ParseResult[string]{next, parsed, err}
-
-			if !reflect.DeepEqual(got, tc.want) {
-				t.Fatalf("%s: expected %+v, but got %+v", tc.name, tc.want, got)
-			}
-		})
-
-	}
+	ExecParserTestCases[rune, string](t, Char, tests)
 }
 
 func TestMatch(t *testing.T) {
-	tests := []struct {
-		TestParserCore[string]
-		target string
-	}{
+	tests := []ParserTestCase[string, string]{
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "successful parse",
-				input: "This is a message",
-				want: ParseResult[string]{
-					next:   " is a message",
-					parsed: "This",
-					err:    nil,
-				},
+			name:   "successful parse",
+			input:  "This is a message",
+			params: "This",
+			want: ParseResult[string]{
+				next:   " is a message",
+				parsed: "This",
+				err:    nil,
 			},
-			target: "This",
 		},
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "too short input error",
-				input: "short",
-				want: ParseResult[string]{
-					next:   "",
-					parsed: "",
-					err:    fmt.Errorf("input string is too short for parse"),
-				},
+			name:   "too short input error",
+			input:  "short",
+			params: "Long params",
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("input string is too short for parse"),
 			},
-			target: "Long target",
 		},
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "target does not match error",
-				input: "My test string",
-				want: ParseResult[string]{
-					next:   "",
-					parsed: "",
-					err:    fmt.Errorf("target does not match"),
-				},
+			name:   "params does not match error",
+			input:  "My test string",
+			params: "Your",
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("target does not match"),
 			},
-			target: "Your",
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			next, parsed, err := Match(tc.target)(tc.input)
-			got := ParseResult[string]{next, parsed, err}
-
-			if !reflect.DeepEqual(got, tc.want) {
-				t.Fatalf("%s: expected %+v, but got %+v", tc.name, tc.want, got)
-			}
-		})
-	}
-
+	ExecParserTestCases[string, string](t, Match, tests)
 }
 
 func TestTake(t *testing.T) {
-	tests := []struct {
-		TestParserCore[string]
-		amount uint
-	}{
+	tests := []ParserTestCase[uint, string]{
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "successful parse",
-				input: "123456789",
-				want: ParseResult[string]{
-					next:   "56789",
-					parsed: "1234",
-					err:    nil,
-				},
+			name:   "successful parse",
+			input:  "123456789",
+			params: 4,
+			want: ParseResult[string]{
+				next:   "56789",
+				parsed: "1234",
+				err:    nil,
 			},
-			amount: 4,
 		},
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "too short input error",
-				input: "short",
-				want: ParseResult[string]{
-					next:   "",
-					parsed: "",
-					err:    fmt.Errorf("input string is too short for parse"),
-				},
+			name:   "too short input error",
+			input:  "short",
+			params: 10,
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("input string is too short for parse"),
 			},
-			amount: 10,
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			next, parsed, err := Take(tc.amount)(tc.input)
-			got := ParseResult[string]{next, parsed, err}
+	ExecParserTestCases[uint, string](t, Take, tests)
 
-			if !reflect.DeepEqual(got, tc.want) {
-				t.Fatalf("%s: expected %+v, but got %+v", tc.name, tc.want, got)
-			}
-		})
-	}
 }
 
 func TestOneOf(t *testing.T) {
-	tests := []struct {
-		TestParserCore[string]
-		characters string
-	}{
+	tests := []ParserTestCase[string, string]{
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "successful parse",
-				input: "abcdefg",
-				want: ParseResult[string]{
-					next:   "bcdefg",
-					parsed: "a",
-					err:    nil,
-				},
+			name:   "successful parse",
+			input:  "abcdefg",
+			params: "xyaz",
+			want: ParseResult[string]{
+				next:   "bcdefg",
+				parsed: "a",
+				err:    nil,
 			},
-			characters: "xyaz",
 		},
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "too short input error",
-				input: "",
-				want: ParseResult[string]{
-					next:   "",
-					parsed: "",
-					err:    fmt.Errorf("input string is too short for parse"),
-				},
+			name:   "too short input error",
+			input:  "",
+			params: "abc",
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("input string is too short for parse"),
 			},
-			characters: "abc",
 		},
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "none character match error",
-				input: "abc",
-				want: ParseResult[string]{
-					next:   "",
-					parsed: "",
-					err:    fmt.Errorf("none character match"),
-				},
+			name:   "none character match error",
+			input:  "abc",
+			params: "xyz",
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("none character match"),
 			},
-			characters: "xyz",
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			next, parsed, err := OneOf(tc.characters)(tc.input)
-			got := ParseResult[string]{next, parsed, err}
-
-			if !reflect.DeepEqual(got, tc.want) {
-				t.Fatalf("%s: expected %+v, but got %+v", tc.name, tc.want, got)
-			}
-		})
-	}
+	ExecParserTestCases[string, string](t, OneOf, tests)
 }
 
 func TestNoneOf(t *testing.T) {
-	tests := []struct {
-		TestParserCore[string]
-		characters string
-	}{
+	tests := []ParserTestCase[string, string]{
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "successful parse",
-				input: "abcde",
-				want: ParseResult[string]{
-					next:   "bcde",
-					parsed: "a",
-					err:    nil,
-				},
+			name:   "successful parse",
+			input:  "abcde",
+			params: "xyz",
+			want: ParseResult[string]{
+				next:   "bcde",
+				parsed: "a",
+				err:    nil,
 			},
-			characters: "xyz",
 		},
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "too short input error",
-				input: "",
-				want: ParseResult[string]{
-					next:   "",
-					parsed: "",
-					err:    fmt.Errorf("input string is too short for parse"),
-				},
+			name:   "too short input error",
+			input:  "",
+			params: "abc",
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("input string is too short for parse"),
 			},
-			characters: "abc",
 		},
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "some character match error",
-				input: "abcde",
-				want: ParseResult[string]{
-					next:   "",
-					parsed: "",
-					err:    fmt.Errorf("some character match"),
-				},
+			name:   "some character match error",
+			input:  "abcde",
+			params: "abc",
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("some character match"),
 			},
-			characters: "abc",
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			next, parsed, err := NoneOf(tc.characters)(tc.input)
-			got := ParseResult[string]{next, parsed, err}
-
-			if !reflect.DeepEqual(got, tc.want) {
-				t.Fatalf("%s: expected %+v, but got %+v", tc.name, tc.want, got)
-			}
-		})
-	}
+	ExecParserTestCases[string, string](t, NoneOf, tests)
 }
 
 func TestTakeUntil(t *testing.T) {
-	tests := []struct {
-		TestParserCore[string]
-		target string
-	}{
+	tests := []ParserTestCase[string, string]{
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "successful parse",
-				input: "Hello my name is FooBar",
-				want: ParseResult[string]{
-					next:   "name is FooBar",
-					parsed: "Hello my ",
-					err:    nil,
-				},
+			name:   "successful parse",
+			input:  "Hello my name is FooBar",
+			params: "name",
+			want: ParseResult[string]{
+				next:   "name is FooBar",
+				parsed: "Hello my ",
+				err:    nil,
 			},
-			target: "name",
 		},
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "target dont match",
-				input: "Hello my name is FooBar",
-				want: ParseResult[string]{
-					next:   "Hello my name is FooBar",
-					parsed: "",
-					err:    nil,
-				},
+			name:   "params dont match",
+			input:  "Hello my name is FooBar",
+			params: "people",
+			want: ParseResult[string]{
+				next:   "Hello my name is FooBar",
+				parsed: "",
+				err:    nil,
 			},
-			target: "people",
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			next, parsed, err := TakeUntil(tc.target)(tc.input)
-			got := ParseResult[string]{next, parsed, err}
-
-			if !reflect.DeepEqual(got, tc.want) {
-				t.Fatalf("%s: expected %+v, but got %+v", tc.name, tc.want, got)
-			}
-		})
-	}
+	ExecParserTestCases[string, string](t, TakeUntil, tests)
 }
 
 func TestStrictTakeUntil(t *testing.T) {
-	tests := []struct {
-		TestParserCore[string]
-		target string
-	}{
+	tests := []ParserTestCase[string, string]{
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "successful parse",
-				input: "Hello my name is StrictFooBar",
-				want: ParseResult[string]{
-					next:   "name is StrictFooBar",
-					parsed: "Hello my ",
-					err:    nil,
-				},
+			name:   "successful parse",
+			input:  "Hello my name is StrictFooBar",
+			params: "name",
+			want: ParseResult[string]{
+				next:   "name is StrictFooBar",
+				parsed: "Hello my ",
+				err:    nil,
 			},
-			target: "name",
 		},
 		{
-			TestParserCore: TestParserCore[string]{
-				name:  "target dont match error",
-				input: "Hello my name is StrictFooBar",
-				want: ParseResult[string]{
-					next:   "",
-					parsed: "",
-					err:    fmt.Errorf("cannot match target"),
-				},
+			name:   "params dont match error",
+			input:  "Hello my name is StrictFooBar",
+			params: "people",
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("cannot match target"),
 			},
-			target: "people",
 		},
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			next, parsed, err := StrictTakeUntil(tc.target)(tc.input)
-			got := ParseResult[string]{next, parsed, err}
-
-			if !reflect.DeepEqual(got, tc.want) {
-				t.Fatalf("%s: expected %+v, but got %+v", tc.name, tc.want, got)
-			}
-		})
-	}
+	ExecParserTestCases[string, string](t, StrictTakeUntil, tests)
 }
