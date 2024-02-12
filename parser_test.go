@@ -284,22 +284,45 @@ func TestNoneOf(t *testing.T) {
 }
 
 func TestTakeUntil(t *testing.T) {
-	// arrange
-	input := "Hello my name is AlfredoPrograma"
-	separator := "name"
-	expectedParsed := "Hello my "
-	expectedNext := "name is AlfredoPrograma"
-
-	// act
-	next, parsed, _ := TakeUntil(separator)(input)
-
-	// assert
-	if parsed != expectedParsed {
-		t.Errorf("should return the parsed character")
+	tests := []struct {
+		TestParserCore[string]
+		target string
+	}{
+		{
+			TestParserCore: TestParserCore[string]{
+				name:  "successful parse",
+				input: "Hello my name is FooBar",
+				want: ParseResult[string]{
+					next:   "name is FooBar",
+					parsed: "Hello my ",
+					err:    nil,
+				},
+			},
+			target: "name",
+		},
+		{
+			TestParserCore: TestParserCore[string]{
+				name:  "target dont match",
+				input: "Hello my name is FooBar",
+				want: ParseResult[string]{
+					next:   "Hello my name is FooBar",
+					parsed: "",
+					err:    nil,
+				},
+			},
+			target: "people",
+		},
 	}
 
-	if next != expectedNext {
-		t.Errorf("should return the rest of the input")
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			next, parsed, err := TakeUntil(tc.target)(tc.input)
+			got := ParseResult[string]{next, parsed, err}
+
+			if !reflect.DeepEqual(got, tc.want) {
+				t.Fatalf("%s: expected %+v, but got %+v", tc.name, tc.want, got)
+			}
+		})
 	}
 }
 
