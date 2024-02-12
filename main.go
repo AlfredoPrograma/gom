@@ -3,7 +3,16 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("Hello world")
+	input := "foo bar baz"
 
-	Char('2')("")
+	next, parsed, err := Alt[string](
+		ParsersList[string]{
+			Match("hazam"),
+			Match("uwu"),
+		},
+	)(input)
+
+	fmt.Println("[ERROR] ", err)
+	fmt.Println("[NEXT] ", next)
+	fmt.Println("[PARSED] ", parsed)
 }
