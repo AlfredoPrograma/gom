@@ -69,45 +69,63 @@ func TestStrictTakeWhile(t *testing.T) {
 }
 
 func TestTakeTill(t *testing.T) {
-	// arrange
-	input := "abc!#123"
-	expectedParsed := "abc!#"
-	expectedNext := "123"
-
-	// act
-	next, parsed, _ := TakeTill(func(ch rune) bool {
-		return unicode.IsDigit(ch)
-	})(input)
-
-	// assert
-	if parsed != expectedParsed {
-		t.Errorf("should return the parsed character")
+	tests := []ParserTestCase[Predicate, string]{
+		{
+			name:  "successful parse",
+			input: "abcd!#123",
+			params: func(ch rune) bool {
+				return unicode.IsDigit(ch)
+			},
+			want: ParseResult[string]{
+				next:   "123",
+				parsed: "abcd!#",
+				err:    nil,
+			},
+		},
+		{
+			name:  "predicate dont match",
+			input: "abc!#123",
+			params: func(ch rune) bool {
+				return unicode.IsLetter(ch)
+			},
+			want: ParseResult[string]{
+				next:   "abc!#123",
+				parsed: "",
+				err:    nil,
+			},
+		},
 	}
 
-	if next != expectedNext {
-		t.Errorf("should return the rest of the input")
-	}
+	ExecParserTestCases[Predicate, string](t, TakeTill, tests)
 }
 
-func TestStrictTakeTillFail(t *testing.T) {
-	// arrange
-	input := "abcd123"
-
-	// act
-	next, parsed, err := StrictTakeTill(func(ch rune) bool {
-		return unicode.IsDigit(ch)
-	})(input)
-
-	// assert
-	if parsed != "" {
-		t.Errorf("should return empty parsed string because it failed")
+func TestStrictTakeTill(t *testing.T) {
+	tests := []ParserTestCase[Predicate, string]{
+		{
+			name:  "successful parse",
+			input: "\n\t\ta lot of spaces",
+			params: func(ch rune) bool {
+				return unicode.IsSpace(ch)
+			},
+			want: ParseResult[string]{
+				next:   "a lot of spaces",
+				parsed: "\n\t\t",
+				err:    nil,
+			},
+		},
+		{
+			name:  "predicate dont match error",
+			input: "123456789",
+			params: func(ch rune) bool {
+				return unicode.IsLetter(ch)
+			},
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("at least one character should match with the predicate"),
+			},
+		},
 	}
 
-	if next != "" {
-		t.Errorf("should return empty rest of the input because it failed")
-	}
-
-	if err == nil {
-		t.Error("should return an error because none character complied predicate on strict parser")
-	}
+	ExecParserTestCases[Predicate, string](t, StrictTakeTill, tests)
 }
