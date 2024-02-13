@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type PairResult[T, K any] struct {
 	first  T
@@ -26,5 +28,31 @@ func Pair[T, K any](firstParser Parser[T], secondParser Parser[K]) Parser[PairRe
 		result.second = p2
 
 		return next, result, nil
+	}
+}
+
+func Delimited[T, K, O any](opener Parser[T], parser Parser[O], closer Parser[K]) Parser[O] {
+	return func(input string) (string, O, error) {
+		next, _, err := opener(input)
+
+		if err != nil {
+			var parsed O
+			return "", parsed, fmt.Errorf("opener parser failed")
+		}
+
+		next, parsed, err := parser(next)
+
+		if err != nil {
+			return "", parsed, fmt.Errorf("content parser failed")
+		}
+
+		next, _, err = closer(next)
+
+		if err != nil {
+			var parsed O
+			return "", parsed, fmt.Errorf("closer parser failed")
+		}
+
+		return next, parsed, nil
 	}
 }
