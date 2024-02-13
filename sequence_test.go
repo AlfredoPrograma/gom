@@ -163,3 +163,70 @@ func TestDelimited(t *testing.T) {
 		})
 	}
 }
+
+func TestPreceded(t *testing.T) {
+	type PrecededParserParams[T, O any] struct {
+		preceded Parser[T]
+		content  Parser[O]
+	}
+
+	type PrecededParserTestCase[T, O any] struct {
+		name   string
+		input  string
+		params PrecededParserParams[T, O]
+		want   ParseResult[string]
+	}
+
+	tests := []PrecededParserTestCase[string, string]{
+		{
+			name:  "successful parse",
+			input: "prefixHelloSuffix",
+			params: PrecededParserParams[string, string]{
+				preceded: Match("prefix"),
+				content:  Match("Hello"),
+			},
+			want: ParseResult[string]{
+				next:   "Suffix",
+				parsed: "Hello",
+				err:    nil,
+			},
+		},
+		{
+			name:  "preceded parser fail error",
+			input: "<tag/>",
+			params: PrecededParserParams[string, string]{
+				preceded: Match("{"),
+				content:  Match("tag/>"),
+			},
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("preceded parser failed"),
+			},
+		},
+		{
+			name:  "content parser fail error",
+			input: "[PARSER",
+			params: PrecededParserParams[string, string]{
+				preceded: Char('['),
+				content:  StrictTakeWhile(unicode.IsLower),
+			},
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("content parser failed"),
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			next, parsed, err := Preceded[string, string](tc.params.preceded, tc.params.content)(tc.input)
+			got := ParseResult[string]{next, parsed, err}
+
+			if !reflect.DeepEqual(got, tc.want) {
+				t.Fatalf("%s: expected %+v, but got %+v", tc.name, tc.want, got)
+			}
+		})
+	}
+}

@@ -56,3 +56,23 @@ func Delimited[T, K, O any](opener Parser[T], parser Parser[O], closer Parser[K]
 		return next, parsed, nil
 	}
 }
+
+func Preceded[T, O any](preceded Parser[T], parser Parser[O]) Parser[O] {
+	return func(input string) (string, O, error) {
+		next, _, err := preceded(input)
+
+		if err != nil {
+			var parsed O
+			return "", parsed, fmt.Errorf("preceded parser failed")
+		}
+
+		next, parsed, err := parser(next)
+
+		if err != nil {
+			var parsed O
+			return "", parsed, fmt.Errorf("content parser failed")
+		}
+
+		return next, parsed, nil
+	}
+}
