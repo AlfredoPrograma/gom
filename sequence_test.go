@@ -230,3 +230,70 @@ func TestPreceded(t *testing.T) {
 		})
 	}
 }
+
+func TestTerminated(t *testing.T) {
+	type TerminatedParserParams[T, O any] struct {
+		terminated Parser[T]
+		content    Parser[O]
+	}
+
+	type TerminatedParserTestCase[T, O any] struct {
+		name   string
+		input  string
+		params TerminatedParserParams[T, O]
+		want   ParseResult[string]
+	}
+
+	tests := []TerminatedParserTestCase[string, string]{
+		{
+			name:  "successful parse",
+			input: "hello>>>",
+			params: TerminatedParserParams[string, string]{
+				content:    Match("hello"),
+				terminated: Match(">>>"),
+			},
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "hello",
+				err:    nil,
+			},
+		},
+		{
+			name:  "content parser fail error",
+			input: "12345>",
+			params: TerminatedParserParams[string, string]{
+				content:    StrictTakeWhile(unicode.IsLetter),
+				terminated: Char('>'),
+			},
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("content parser failed"),
+			},
+		},
+		{
+			name:  "terminated parser fail error",
+			input: "abcde<<<",
+			params: TerminatedParserParams[string, string]{
+				content:    StrictTakeWhile(unicode.IsLetter),
+				terminated: StrictTakeWhile(unicode.IsDigit),
+			},
+			want: ParseResult[string]{
+				next:   "",
+				parsed: "",
+				err:    fmt.Errorf("terminated parser failed"),
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			next, parsed, err := Terminated[string](tc.params.content, tc.params.terminated)(tc.input)
+			got := ParseResult[string]{next, parsed, err}
+
+			if !reflect.DeepEqual(got, tc.want) {
+				t.Fatalf("%s: expected %+v, but got %+v", tc.name, tc.want, got)
+			}
+		})
+	}
+}

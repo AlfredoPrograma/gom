@@ -76,3 +76,22 @@ func Preceded[T, O any](preceded Parser[T], parser Parser[O]) Parser[O] {
 		return next, parsed, nil
 	}
 }
+
+func Terminated[T, O any](parser Parser[O], terminated Parser[T]) Parser[O] {
+	return func(input string) (string, O, error) {
+		next, parsed, err := parser(input)
+
+		if err != nil {
+			return "", parsed, fmt.Errorf("content parser failed")
+		}
+
+		next, _, err = terminated(next)
+
+		if err != nil {
+			var parsed O
+			return "", parsed, fmt.Errorf("terminated parser failed")
+		}
+
+		return next, parsed, nil
+	}
+}
