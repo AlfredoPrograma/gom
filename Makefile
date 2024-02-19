@@ -1,9 +1,6 @@
 COVER_FILEANME=cover.out
 ALL_PKGS=./...
 
-run:
-	go run $(ALL_PKGS)
-
 test:
 	go test $(ALL_PKGS)
 
