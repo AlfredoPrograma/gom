@@ -26,13 +26,13 @@ func evalRepetition[O any](input string, parser Parser[O], parserMode ParserMode
 
 func Many[O any](parser Parser[O]) Parser[[]O] {
 	return func(input string) (string, []O, error) {
-		return evalRepetition[O](input, parser, FLEX)
+		return evalRepetition(input, parser, FLEX)
 	}
 }
 
 func StrictMany[O any](parser Parser[O]) Parser[[]O] {
 	return func(input string) (string, []O, error) {
-		return evalRepetition[O](input, parser, STRICT)
+		return evalRepetition(input, parser, STRICT)
 	}
 }
 

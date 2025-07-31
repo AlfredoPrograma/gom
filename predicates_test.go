@@ -34,7 +34,7 @@ func TestTakeWhile(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[Predicate, string](t, TakeWhile, tests)
+	ExecParserTestCases(t, TakeWhile, tests)
 }
 
 func TestStrictTakeWhile(t *testing.T) {
@@ -65,7 +65,7 @@ func TestStrictTakeWhile(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[Predicate, string](t, StrictTakeWhile, tests)
+	ExecParserTestCases(t, StrictTakeWhile, tests)
 }
 
 func TestTakeTill(t *testing.T) {
@@ -96,7 +96,7 @@ func TestTakeTill(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[Predicate, string](t, TakeTill, tests)
+	ExecParserTestCases(t, TakeTill, tests)
 }
 
 func TestStrictTakeTill(t *testing.T) {
@@ -127,5 +127,5 @@ func TestStrictTakeTill(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[Predicate, string](t, StrictTakeTill, tests)
+	ExecParserTestCases(t, StrictTakeTill, tests)
 }

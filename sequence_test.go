@@ -67,7 +67,7 @@ func TestPair(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			next, parsed, err := Pair[string, string](tc.params.first, tc.params.second)(tc.input)
+			next, parsed, err := Pair(tc.params.first, tc.params.second)(tc.input)
 			got := ParseResult[PairResult[string, string]]{next, parsed, err}
 
 			if !reflect.DeepEqual(got, tc.want) {
@@ -154,7 +154,7 @@ func TestDelimited(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			next, parsed, err := Delimited[string, string, string](tc.params.opener, tc.params.content, tc.params.closer)(tc.input)
+			next, parsed, err := Delimited(tc.params.opener, tc.params.content, tc.params.closer)(tc.input)
 			got := ParseResult[string]{next, parsed, err}
 
 			if !reflect.DeepEqual(got, tc.want) {
@@ -221,7 +221,7 @@ func TestPreceded(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			next, parsed, err := Preceded[string, string](tc.params.preceded, tc.params.content)(tc.input)
+			next, parsed, err := Preceded(tc.params.preceded, tc.params.content)(tc.input)
 			got := ParseResult[string]{next, parsed, err}
 
 			if !reflect.DeepEqual(got, tc.want) {
@@ -288,7 +288,7 @@ func TestTerminated(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			next, parsed, err := Terminated[string](tc.params.content, tc.params.terminated)(tc.input)
+			next, parsed, err := Terminated(tc.params.content, tc.params.terminated)(tc.input)
 			got := ParseResult[string]{next, parsed, err}
 
 			if !reflect.DeepEqual(got, tc.want) {

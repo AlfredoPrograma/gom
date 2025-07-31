@@ -39,7 +39,7 @@ func TestChar(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[rune, string](t, Char, tests)
+	ExecParserTestCases(t, Char, tests)
 }
 
 func TestMatch(t *testing.T) {
@@ -76,7 +76,7 @@ func TestMatch(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[string, string](t, Match, tests)
+	ExecParserTestCases(t, Match, tests)
 }
 
 func TestTake(t *testing.T) {
@@ -103,7 +103,7 @@ func TestTake(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[uint, string](t, Take, tests)
+	ExecParserTestCases(t, Take, tests)
 
 }
 
@@ -141,7 +141,7 @@ func TestOneOf(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[string, string](t, OneOf, tests)
+	ExecParserTestCases(t, OneOf, tests)
 }
 
 func TestNoneOf(t *testing.T) {
@@ -178,7 +178,7 @@ func TestNoneOf(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[string, string](t, NoneOf, tests)
+	ExecParserTestCases(t, NoneOf, tests)
 }
 
 func TestTakeUntil(t *testing.T) {
@@ -205,7 +205,7 @@ func TestTakeUntil(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[string, string](t, TakeUntil, tests)
+	ExecParserTestCases(t, TakeUntil, tests)
 }
 
 func TestStrictTakeUntil(t *testing.T) {
@@ -232,5 +232,5 @@ func TestStrictTakeUntil(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[string, string](t, StrictTakeUntil, tests)
+	ExecParserTestCases(t, StrictTakeUntil, tests)
 }

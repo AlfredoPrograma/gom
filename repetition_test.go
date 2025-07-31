@@ -35,7 +35,7 @@ func TestMany(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[Parser[string], []string](t, Many, tests)
+	ExecParserTestCases(t, Many, tests)
 }
 
 func TestStrictMany(t *testing.T) {
@@ -62,7 +62,7 @@ func TestStrictMany(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[Parser[string], []string](t, StrictMany, tests)
+	ExecParserTestCases(t, StrictMany, tests)
 }
 
 func TestCount(t *testing.T) {
@@ -109,7 +109,7 @@ func TestCount(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			next, parsed, err := Count[string](tc.params.parser, tc.params.times)(tc.input)
+			next, parsed, err := Count(tc.params.parser, tc.params.times)(tc.input)
 			got := ParseResult[[]string]{next, parsed, err}
 
 			if !reflect.DeepEqual(got, tc.want) {

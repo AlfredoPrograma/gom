@@ -36,5 +36,5 @@ func TestAlt(t *testing.T) {
 		},
 	}
 
-	ExecParserTestCases[ParsersList[string], string](t, Alt, tests)
+	ExecParserTestCases(t, Alt, tests)
 }
